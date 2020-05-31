@@ -160,8 +160,13 @@
     // console.log(possible_matches);
 
     // print_r(json_decode($var));                      tak się odkodowuje w php obiekt z jsona
-
-    let possible_matches = JSON.parse('<?php echo json_encode($possible_matches) ?>'); // convert php obects into json objects
+<?php
+    $possible_matches_ids = [];
+    foreach($possible_matches as $pm) {
+        array_push($possible_matches_ids, $pm->id);
+    }
+?>
+    let possible_matches = JSON.parse('<?php echo json_encode($possible_matches_ids) ?>'); // convert php objects into json objects
 
     function updateProposition() {
         $.ajax({
@@ -182,7 +187,7 @@
         $.ajax({
             type: 'GET',
             url: 'action/make_rejection.php',
-            data: 'rejected_user_id=' + possible_matches[0]['id'],
+            data: 'rejected_user_id=' + possible_matches[0],
             success: function() {
                 console.log("user rejected");
                 possible_matches.shift();
@@ -195,7 +200,7 @@
         $.ajax({
             type: 'GET',
             url: 'action/make_request.php',
-            data: 'requested_user_id=' + possible_matches[0]['id'],
+            data: 'requested_user_id=' + possible_matches[0],
             success: function() {
                 console.log("user requested");
                 possible_matches.shift();

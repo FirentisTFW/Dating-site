@@ -9,7 +9,9 @@ if (isset($_POST['objects_array'])) {
     $possible_match_array = $possible_matches[0];
 }
 
-$possible_match = User::createObject($possible_match_array);            // data is passed as array by POST, data must be converted into object 
+// $possible_match = User::createObject($possible_match_array);            // data is passed as array by POST, data must be converted into object 
+$possible_match = User::findById($possible_match_array);            // data is passed as array by POST, data must be converted into object 
+
 // print_r($possible_match);
 
 if (!empty($possible_match)) {
