@@ -53,13 +53,17 @@
 
             $user = User::findById($_SESSION['user_id']);
 
-            $possible_match = $user->findPossibleMatches(30);
+            $possible_matches = $user->findPossibleMatches(30);                     // array of possible matches for $user
+
+            $possible_match = $possible_matches[0];                       // take the first match
 
             // print_r($possible_match);
             if (!empty($possible_match))
                 $photos_of_pm = Photo::findAllOfOneUser($possible_match->id);
 
             ?>
+
+            <!-- RIGHT SIDE PANEL - PROPOSTIONS TO MATCH -->
 
             <div class="col-8">
                 <div class="row right-side-bar">
@@ -114,7 +118,7 @@
                                 <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
                                     <span class="carousel-control-next-icon"></span>
                                 </a>
-                                <div class="name">                  
+                                <div class="name">
                                     <?php if (isset($possible_match->name)) echo $possible_match->name . ", ";                            // show name and age
                                     if (isset($possible_match->birth_date)) echo $possible_match->getAge($possible_match->birth_date); ?>
                                 </div>
@@ -127,16 +131,16 @@
                             <div class="row no-gutters">
                                 <div class="icon-prop col-6">
                                     <div class="icon-prop-inner rounded-circle">
-                                        <a href="action/make_rejection.php?rejected_user_id=<?php if (isset($possible_match->id)) echo $possible_match->id ?>">
-                                            <img src="images/cross.png" class="" alt="">
-                                        </a>
+                                        <!-- <a href="action/make_rejection.php?rejected_user_id=<?php if (isset($possible_match->id)) echo $possible_match->id ?>"> -->
+                                        <img src="images/cross.png" class="" alt="">
+                                        <!-- </a> -->
                                     </div>
                                 </div>
                                 <div class="icon-prop col-6">
                                     <div class="icon-prop-inner rounded-circle">
-                                        <a href="action/make_request.php?requested_user_id=<?php if (isset($possible_match->id)) echo $possible_match->id ?>">
-                                            <img src="images/check2.png" class="" alt="">
-                                        </a>
+                                        <!-- <a href="action/make_request.php?requested_user_id=<?php if (isset($possible_match->id)) echo $possible_match->id ?>"> -->
+                                        <img src="images/check2.png" class="" alt="">
+                                        <!-- </a> -->
                                     </div>
                                 </div>
                             </div>
@@ -152,21 +156,56 @@
 
 </div>
 
-<script> 
+<script>
+    // console.log(possible_matches);
 
-    // function updateProposition() {
-    //     $.ajax({
-    //         type: 'POST',
-    //         url: 'action/update_proposition.php',
-    //         data: {
+    // print_r(json_decode($var));                      tak się odkodowuje w php obiekt z jsona
 
-    //         },
-    //         success: function() {
+    let possible_matches = JSON.parse('<?php echo json_encode($possible_matches) ?>'); // convert php obects into json objects
 
-    //         }
-    //     });
-    // }
+    function updateProposition() {
+        $.ajax({
+            type: 'POST',
+            url: 'action/update_proposition.php',
+            data: {
+                objects_array: possible_matches
+            },
+            success: function(output) {
+                document.getElementById("propositions").innerHTML = output;
+                document.getElementsByClassName("icon-prop-inner")[0].addEventListener("click", makeRejection);
+                document.getElementsByClassName("icon-prop-inner")[1].addEventListener("click", makeRequest);
+            }
+        });
+    }
 
+    function makeRejection() {
+        $.ajax({
+            type: 'GET',
+            url: 'action/make_rejection.php',
+            data: 'rejected_user_id=' + possible_matches[0]['id'],
+            success: function() {
+                console.log("user rejected");
+                possible_matches.shift();
+                updateProposition();
+            }
+        });
+    }
+
+    function makeRequest() {
+        $.ajax({
+            type: 'GET',
+            url: 'action/make_request.php',
+            data: 'requested_user_id=' + possible_matches[0]['id'],
+            success: function() {
+                console.log("user requested");
+                possible_matches.shift();
+                updateProposition();
+            }
+        });
+    }
+
+    document.getElementsByClassName("icon-prop-inner")[0].addEventListener("click", makeRejection);
+    document.getElementsByClassName("icon-prop-inner")[1].addEventListener("click", makeRequest);
 </script>
 
 <?php require_once "includes/footer.php" ?>

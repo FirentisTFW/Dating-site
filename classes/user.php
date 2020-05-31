@@ -185,7 +185,9 @@ class User extends DbObject {
 
         $possible_users = [];
 
-        for ($i=0; $i < count($users); $i++) {
+        $counter = count($users);
+
+        for ($i=0; $i < $counter; $i++) {
 
             $date = substr($users[$i]->birth_date, 0, 10);
             $then = date('Ymd', strtotime($users[$i]->birth_date));
@@ -224,7 +226,7 @@ class User extends DbObject {
             //     array_push($possible_users, $users[$i]);
             // }
             if($this->id != $users[$i]->id)
-                return $users[$i];
+                array_push($possible_users, $users[$i]);
         }
 
         return $possible_users;

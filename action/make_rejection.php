@@ -23,7 +23,7 @@ if (isset($_GET['rejected_user_id'])) {
         $request->delete();
     }
 
-    header('Location: ../main_find_matches.php');
+   // header('Location: ../main_find_matches.php');
 }
 
  ?>

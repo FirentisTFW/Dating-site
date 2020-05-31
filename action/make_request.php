@@ -29,7 +29,7 @@ if (isset($_GET['requested_user_id'])) {
         $request->save();
     }
 
-    header('Location: ../main_find_matches.php');
+   // header('Location: ../main_find_matches.php');
 }
 
  ?>
