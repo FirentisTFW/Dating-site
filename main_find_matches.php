@@ -53,9 +53,10 @@
 
             $user = User::findById($_SESSION['user_id']);
 
-            $possible_matches = $user->findPossibleMatches(30);                     // array of possible matches for $user
+            $possible_matches = $user->findPossibleMatches(100);                     // array of possible matches for $user
 
-            $possible_match = $possible_matches[0];                       // take the first match
+            if(!empty($possible_matches))
+                $possible_match = $possible_matches[0];                       // take the first match
 
             // print_r($possible_match);
             if (!empty($possible_match))
@@ -157,18 +158,18 @@
 </div>
 
 <script>
-    // console.log(possible_matches);
-
-    // print_r(json_decode($var));                      tak się odkodowuje w php obiekt z jsona
-<?php
-    $possible_matches_ids = [];
-    foreach($possible_matches as $pm) {
-        array_push($possible_matches_ids, $pm->id);
-    }
-?>
+    <?php
+        $possible_matches_ids = [];
+        foreach ($possible_matches as $pm) {
+            array_push($possible_matches_ids, $pm->id);
+        }
+    ?>
+    
     let possible_matches = JSON.parse('<?php echo json_encode($possible_matches_ids) ?>'); // convert php objects into json objects
 
     function updateProposition() {
+        // if (possible_matches.length <= 1)                   // resfresh site from time to time to find new matches
+        //     location.reload();
         $.ajax({
             type: 'POST',
             url: 'action/update_proposition.php',
@@ -177,8 +178,10 @@
             },
             success: function(output) {
                 document.getElementById("propositions").innerHTML = output;
-                document.getElementsByClassName("icon-prop-inner")[0].addEventListener("click", makeRejection);
-                document.getElementsByClassName("icon-prop-inner")[1].addEventListener("click", makeRequest);
+                if (document.getElementsByClassName("icon-prop-inner")[0])
+                    document.getElementsByClassName("icon-prop-inner")[0].addEventListener("click", makeRejection);
+                if (document.getElementsByClassName("icon-prop-inner")[1])
+                    document.getElementsByClassName("icon-prop-inner")[1].addEventListener("click", makeRequest);
             }
         });
     }
@@ -208,9 +211,10 @@
             }
         });
     }
-
-    document.getElementsByClassName("icon-prop-inner")[0].addEventListener("click", makeRejection);
-    document.getElementsByClassName("icon-prop-inner")[1].addEventListener("click", makeRequest);
+    if (document.getElementsByClassName("icon-prop-inner")[0])
+        document.getElementsByClassName("icon-prop-inner")[0].addEventListener("click", makeRejection);
+    if (document.getElementsByClassName("icon-prop-inner")[1])
+        document.getElementsByClassName("icon-prop-inner")[1].addEventListener("click", makeRequest);
 </script>
 
 <?php require_once "includes/footer.php" ?>

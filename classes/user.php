@@ -194,8 +194,9 @@ class User extends DbObject {
             $diff = date('Ymd') - $then;
             $age = substr($diff, 0, -4);
 
-            $age_min = 18;          // ZROBIĆ TO PORZADNIE!
-            $age_max = 28;
+            $age_arr = explode("-", $this->looking_for_aged);
+            $age_min = $age_arr[0];         
+            $age_max = $age_arr[1];
 
             $flag = false;
 
@@ -214,7 +215,7 @@ class User extends DbObject {
             }
             if ($flag == true) { continue; }
             for ($j=0; $j < count($rejections); $j++) {
-                if($rejections[$j]->second_user_id == $users[$i]->id or $rejections[$j]->first_user_id == $users[$i]->id) {           // check if this person already rejected $this
+                if($rejections[$j]->second_user_id == $users[$i]->id or $rejections[$j]->first_user_id == $users[$i]->id) {       // check if this person already rejected $this
                     $flag = true;
                     break;
                 }
@@ -222,11 +223,12 @@ class User extends DbObject {
             if ($flag == true) { continue; }
 
 
-            // if ($users[$i]->location == $this->location and $age < $age_max and $age > $age_min) {      // age and location check
+            if ($users[$i]->location == $this->location and $age <= $age_max and $age >= $age_min) {      // age and location check
+                if ($this->id != $users[$i]->id)                                                        // check if it's not $user
+                    array_push($possible_users, $users[$i]);
+            }
+            // if($this->id != $users[$i]->id)
             //     array_push($possible_users, $users[$i]);
-            // }
-            if($this->id != $users[$i]->id)
-                array_push($possible_users, $users[$i]);
         }
 
         return $possible_users;

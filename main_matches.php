@@ -8,10 +8,12 @@ $matches = $user->findMatches();
 if (isset($_GET['user_id'])) {
     $match_profile = User::findById($_GET['user_id']);
 } else {
-    if ($matches[0]->first_user_id != $user->id) {
-        $match_profile = User::findById($matches[0]->first_user_id);
-    } else {
-        $match_profile = User::findById($matches[0]->second_user_id);
+    if(!empty($matches)) {                                                               // user has at least one match
+        if ($matches[0]->first_user_id != $user->id) {
+            $match_profile = User::findById($matches[0]->first_user_id);
+        } else {
+            $match_profile = User::findById($matches[0]->second_user_id);
+        }
     }
 }
 
@@ -39,24 +41,27 @@ if (isset($_GET['user_id'])) {
                     <div id="matches-messages" class="col-12">
                         <?php
 
-                        foreach ($matches as $singleMatch) {
-                            if ($singleMatch->first_user_id != $user->id) {
-                                $match = User::findById($singleMatch->first_user_id);
-                            } else {
-                                $match = User::findById($singleMatch->second_user_id);
-                            }
+                        if(!empty($matches)) {
 
-                            $match_profile_photo = $match->getProfilePhoto();
+                            foreach ($matches as $singleMatch) {
+                                if ($singleMatch->first_user_id != $user->id) {
+                                    $match = User::findById($singleMatch->first_user_id);
+                                } else {
+                                    $match = User::findById($singleMatch->second_user_id);
+                                }
+
+                                $match_profile_photo = $match->getProfilePhoto();
 
                         ?>
                             <div class="row ">
                                 <div class="match-row col-12">
                                     <img src="users_images/<?php echo $match_profile_photo->filename; ?>" class="img-fluid matches-row-img" alt="">
-                                    <a href="main_matches.php?user_id=<?php echo $match->id; ?>" class="ml-3"><?php echo $match->name . ", " . User::getAge($match->birth_date); ?></a>
+                                    <!-- <div class="ml-3"><?php echo $match->name . ", " . User::getAge($match->birth_date); ?></div> -->
+                                    <a href="#" class="ml-3" onclick="updateMatch(<?php echo $match->id ?>)"><?php echo $match->name . ", " . User::getAge($match->birth_date); ?></a>
                                     <a href="messages.php?user_id=<?php echo $match->id ?>" class="float-right mt-4"><img src="images/message_icon.png" alt="Send a message" title="Send a message"></a>
                                 </div>
                             </div>
-                        <?php }       // end of for loop (matches) 
+                        <?php }   }    // end of for loop (matches) 
                         ?>
                     </div>
                 </div>
@@ -64,13 +69,16 @@ if (isset($_GET['user_id'])) {
 
             <?php
 
-            $match_profile_photos = Photo::findAllOfOneUser($match_profile->id);
+            if(isset($match_profile) and !empty($match_profile)) $match_profile_photos = Photo::findAllOfOneUser($match_profile->id);
 
             ?>
 
             <div class="col-8">
                 <div class="row right-side-bar">
+
+                    <?php if(isset($match_profile) and !empty($match_profile)) { ?>
                     <div id="show-profile">
+                    
                         <!-- <div class="propositions-img-holder" style="position: relative;"> -->
                         <div id="carouselExampleIndicators" class="carousel slide show-profile-img-holder" style="position: relative;" data-ride="carousel">
                             <ol class="carousel-indicators">
@@ -130,7 +138,11 @@ if (isset($_GET['user_id'])) {
                             <div class="col-2"></div>
                             <a href="action/unmatch.php?user_id=<?php echo $match_profile->id ?>" id="unmatch" class="btn btn-danger col-2 float-right">Unmatch</a>
                         </div>
-                    </div>
+                        </div>
+                    <?php }
+                    else {
+                        echo "<div id='propositions'> <div class='no-matches-info'>You didn't match anybody yet.</div> </div>";
+                    } ?>
                 </div>
             </div>
 
@@ -138,5 +150,27 @@ if (isset($_GET['user_id'])) {
     </main>
 
 </div>
+
+<script>
+    <?php
+    $matches_ids = [];
+    foreach ($matches as $m) {
+        array_push($matches_ids, $m->id);
+    }
+    ?>
+
+    let matches = JSON.parse('<?php echo json_encode($matches_ids) ?>'); // convert php objects into json objects
+
+    function updateMatch(match_id) {
+        $.ajax({
+            type: 'GET',
+            url: 'action/update_match.php',
+            data: 'match_id=' + match_id,
+            success: function(output) {
+                document.getElementById("show-profile").innerHTML = output;
+            }
+        });
+    }
+</script>
 
 <?php require_once "includes/footer.php" ?>

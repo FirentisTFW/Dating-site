@@ -7,12 +7,14 @@ $conversations = $user->findConversations();
 
 if (isset($_GET['user_id'])) {
     $message_profile = User::findById($_GET['user_id']);
-} else {                                                                                // if user clicked "Messages", not any specific user -> redirect to the first match
-    if ($conversations[0]->first_user_id != $user->id) {
-        $message_profile = User::findById($conversations[0]->first_user_id);
-    } else {
-        $message_profile = User::findById($conversations[0]->second_user_id);
-    }
+} else {              
+    if(isset($conversations) and !empty($conversations)) {
+        if ($conversations[0]->first_user_id != $user->id) {                     // if user clicked "Messages", not any specific user -> redirect to the first match
+            $message_profile = User::findById($conversations[0]->first_user_id);
+        } else {
+            $message_profile = User::findById($conversations[0]->second_user_id);
+        }
+    }                                                                 
 }
 
 // $conversation_exists = Conversation::findByQuery("SELECT * FROM conversations WHERE (first_user_id = 16 AND second_user_id = {$_SESSION['user_id']})
@@ -70,6 +72,7 @@ if (isset($_GET['user_id'])) {
 
             <div class="col-8">
                 <div class="row right-side-bar">
+                    <?php if(isset($message_profile_photo)) { ?>
                     <div id="show-messages">
                         <div class="messages-list">
                             <div class="messages-user-info">
@@ -112,7 +115,7 @@ if (isset($_GET['user_id'])) {
                         </div>
                     </div>
                     <div class="write-message">
-                       <!-- <iframe name="frame" style="display: none"></iframe> -->
+                        <!-- <iframe name="frame" style="display: none"></iframe> -->
                         <form class="" method="post" target="frame">
                             <div class="row mt-4">
                                 <div class="write-message-content col-10 ml-4">
@@ -121,8 +124,12 @@ if (isset($_GET['user_id'])) {
                                 <img class="rounded-circle ml-2" style="cursor: pointer;" id="send_message" src="images/send_message2.png" alt="Send message">
                             </div>
                         </form>
-
+                        
                     </div>
+                    <?php } 
+                    else {
+                        echo "<div id='propositions'> <div class='no-matches-info'>You didn't start any conversation yet.</div> </div>";
+                    }?>
                 </div>
             </div>
         </div>
@@ -133,6 +140,8 @@ if (isset($_GET['user_id'])) {
 </div>
 
 <script type="text/javascript">
+
+    <?php if(isset($message_profile)) { ?>
 
     window.addEventListener('DOMContentLoaded', (event) => {
 
@@ -205,6 +214,17 @@ if (isset($_GET['user_id'])) {
             firstMessageId = Number(tempId.substr(10));
         }
 
+        // function changePersonMessages() {
+        //     $.ajax({
+        //         type:'GET',
+        //         url: 'change_person_messages.php',
+        //         data: '',
+        //         success: function() {
+
+        //         }
+        //     });
+        // }
+
         let displayingMessages = setInterval(displayMessages, 500);
 
         document.getElementById("send_message").addEventListener("click", sendMessage);
@@ -221,6 +241,8 @@ if (isset($_GET['user_id'])) {
             });
         }
     });
+
+<?php } ?>
 
 </script>
 
