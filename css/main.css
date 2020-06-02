@@ -37,6 +37,11 @@ a:hover {
     }
 }
 
+.profile-bar-photo {
+    height: 40px;
+    width: 40px;
+}
+
 #my-profile-bar {
     margin: 0;
     height: 60px;

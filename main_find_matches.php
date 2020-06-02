@@ -1,12 +1,20 @@
 <?php require_once "includes/header.php" ?>
 <div class="container">
 
+    <?php
+
+    $user = User::findById($_SESSION['user_id']);
+
+    $user_profile_photo_filename = $user->getProfilePhotoFilename();
+
+    ?>
+
     <main>
         <div class="row left-side-bar">
             <div class="col-4">
                 <div class="row">
                     <div id="my-profile-bar" class="col-12">
-                        <a href="edit_profile_1.php" class="mb-1 mr-5"><img src="https://via.placeholder.com/40" class="rounded-circle mr-3 mb-1" alt="">My Profile</a>
+                        <a href="edit_profile_1.php" class="mb-1 mr-5"><img src="<?php echo $user_profile_photo_filename; ?>" class="rounded-circle mr-3 mb-1 profile-bar-photo" alt="">My profile</a>
                         <a href="logout.php" title="Logout" class="ml-5"><img src="images/logout.png" alt=""> </a>
                     </div>
                 </div>
@@ -23,7 +31,6 @@
 
                         <?php
 
-                        $user = User::findById($_SESSION['user_id']);
                         $matches = $user->findMatches();
 
                         foreach ($matches as $singleMatch) {
@@ -55,7 +62,7 @@
 
             $possible_matches = $user->findPossibleMatches(100);                     // array of possible matches for $user
 
-            if(!empty($possible_matches))
+            if (!empty($possible_matches))
                 $possible_match = $possible_matches[0];                       // take the first match
 
             // print_r($possible_match);
@@ -159,12 +166,12 @@
 
 <script>
     <?php
-        $possible_matches_ids = [];
-        foreach ($possible_matches as $pm) {
-            array_push($possible_matches_ids, $pm->id);
-        }
+    $possible_matches_ids = [];
+    foreach ($possible_matches as $pm) {
+        array_push($possible_matches_ids, $pm->id);
+    }
     ?>
-    
+
     let possible_matches = JSON.parse('<?php echo json_encode($possible_matches_ids) ?>'); // convert php objects into json objects
 
     function updateProposition() {

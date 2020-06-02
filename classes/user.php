@@ -154,6 +154,23 @@ class User extends DbObject {
         return $photo;
     }
 
+    public function getProfilePhotoFilename() {
+
+        $photo = Photo::findById($this->profile_photo_id);
+
+        if(!isset($photo) or empty($photo)) {
+            if($this->sex == 1)                                     // male
+                $photo_filename = "images/profile_pic_m.png";
+            else                                                    // female
+                $photo_filename = "images/profile_pic_m.png";
+        }
+        else {
+            $photo_filename = 'users_images/' . $photo->filename;
+        }
+
+        return $photo_filename;
+    }
+
     public function findMatches() {
 
         $sql = "SELECT * FROM matches WHERE first_user_id = $this->id OR second_user_id = $this->id";

@@ -38,6 +38,8 @@ if (isset($_POST['change'])) {
     header('Refresh: 0');
 }
 
+$user_profile_photo_filename = $user->getProfilePhotoFilename();
+
 ?>
 
 <div class="container">
@@ -47,7 +49,7 @@ if (isset($_POST['change'])) {
             <div class="col-4">
                 <div class="row">
                     <div id="my-profile-bar" class="col-12">
-                        <a href="main_find_matches.php" class="mb-1 mr-5"><img src="https://via.placeholder.com/40" class="rounded-circle mr-3 mb-1" alt="">Explore</a>
+                        <a href="main_find_matches.php" class="mb-1 mr-5"><img src="<?php echo $user_profile_photo_filename; ?>" class="rounded-circle mr-3 mb-1 profile-bar-photo" alt="">Explore</a>
                         <a href="logout.php" title="Logout" class="ml-5"><img src="images/logout.png" alt=""> </a>
                     </div>
                 </div>
